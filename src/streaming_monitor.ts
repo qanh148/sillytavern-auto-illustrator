@@ -186,6 +186,21 @@ export class StreamingMonitor {
           undefined, // No regeneration metadata for new prompts
           promptId // Pass the registered prompt ID from PromptManager
         );
+
+        // Copy the prompt to clipboard
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            // We use .catch on the promise because clipboard API can fail without throwing synchronously
+            navigator.clipboard.writeText(match.prompt).catch((err: unknown) => {
+              logger.warn('Failed to copy prompt to clipboard (promise rejected):', err);
+            });
+            logger.debug('Copied prompt to clipboard');
+          } else {
+            logger.debug('Clipboard API not available');
+          }
+        } catch (err) {
+          logger.warn('Exception while trying to copy prompt to clipboard:', err);
+        }
       }
 
       // Update progress manager with new total
