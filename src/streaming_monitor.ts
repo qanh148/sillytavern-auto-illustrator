@@ -9,13 +9,13 @@
  * - Updates progress manager with totals
  */
 
-import {extractImagePromptsMultiPattern} from './regex';
-import {ImageGenerationQueue} from './streaming_image_queue';
-import type {ImagePromptMatch} from './types';
-import {createLogger} from './logger';
-import {progressManager} from './progress_manager';
-import {registerPrompt} from './prompt_manager';
-import {getMetadata} from './metadata';
+import { extractImagePromptsMultiPattern } from './regex';
+import { ImageGenerationQueue } from './streaming_image_queue';
+import type { ImagePromptMatch } from './types';
+import { createLogger } from './logger';
+import { progressManager } from './progress_manager';
+import { registerPrompt } from './prompt_manager';
+import { getMetadata } from './metadata';
 
 const logger = createLogger('Monitor');
 
@@ -177,7 +177,7 @@ export class StreamingMonitor {
       logger.debug(`Found ${newPromptsWithIds.length} new prompts`);
 
       // Add each new prompt to queue with its registered ID
-      for (const {match, promptId} of newPromptsWithIds) {
+      for (const { match, promptId } of newPromptsWithIds) {
         this.queue.addPrompt(
           match.prompt,
           match.fullMatch,
@@ -186,21 +186,6 @@ export class StreamingMonitor {
           undefined, // No regeneration metadata for new prompts
           promptId // Pass the registered prompt ID from PromptManager
         );
-
-        // Copy the prompt to clipboard
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) {
-            // We use .catch on the promise because clipboard API can fail without throwing synchronously
-            navigator.clipboard.writeText(match.prompt).catch((err: unknown) => {
-              logger.warn('Failed to copy prompt to clipboard (promise rejected):', err);
-            });
-            logger.debug('Copied prompt to clipboard');
-          } else {
-            logger.debug('Clipboard API not available');
-          }
-        } catch (err) {
-          logger.warn('Exception while trying to copy prompt to clipboard:', err);
-        }
       }
 
       // Update progress manager with new total
@@ -235,7 +220,7 @@ export class StreamingMonitor {
   private async extractAndRegisterNewPrompts(
     currentText: string,
     metadata: import('./types').AutoIllustratorChatMetadata
-  ): Promise<Array<{match: ImagePromptMatch; promptId: string}>> {
+  ): Promise<Array<{ match: ImagePromptMatch; promptId: string }>> {
     const patterns = this.settings.promptDetectionPatterns || [];
     const allPrompts = extractImagePromptsMultiPattern(currentText, patterns);
     const newPromptsWithIds: Array<{

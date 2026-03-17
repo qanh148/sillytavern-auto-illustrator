@@ -3,8 +3,8 @@
  * Manages a queue of image prompts detected during streaming
  */
 
-import type {PromptState, QueuedPrompt} from './types';
-import {createLogger} from './logger';
+import type { PromptState, QueuedPrompt } from './types';
+import { createLogger } from './logger';
 
 const logger = createLogger('Queue');
 
@@ -72,7 +72,7 @@ export class ImageGenerationQueue {
       attempts: 0,
       detectedAt: Date.now(),
       // Set targetPromptId for both streaming (from PromptManager) and regeneration
-      ...(targetPromptId && {targetPromptId}),
+      ...(targetPromptId && { targetPromptId }),
       // Add other regeneration metadata if provided
       ...(regenerationMetadata && {
         targetImageUrl: regenerationMetadata.targetImageUrl,
@@ -81,6 +81,12 @@ export class ImageGenerationQueue {
     };
 
     this.prompts.set(id, queuedPrompt);
+    // Copy the prompt to clipboard
+    navigator.clipboard.writeText(prompt).then(() => {
+      console.log('Text copied to clipboard');
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
     logger.info('Added prompt:', id, prompt);
     return queuedPrompt;
   }
@@ -133,7 +139,7 @@ export class ImageGenerationQueue {
   updateState(
     id: string,
     state: PromptState,
-    data?: {imageUrl?: string; error?: string}
+    data?: { imageUrl?: string; error?: string }
   ): void {
     const prompt = this.prompts.get(id);
     if (!prompt) {
