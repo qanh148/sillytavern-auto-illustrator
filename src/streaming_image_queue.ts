@@ -81,12 +81,6 @@ export class ImageGenerationQueue {
     };
 
     this.prompts.set(id, queuedPrompt);
-    // Copy the prompt to clipboard
-    navigator.clipboard.writeText(prompt).then(() => {
-      console.log('Text copied to clipboard');
-    }).catch(err => {
-      console.error('Failed to copy: ', err);
-    });
     logger.info('Added prompt:', id, prompt);
     return queuedPrompt;
   }
