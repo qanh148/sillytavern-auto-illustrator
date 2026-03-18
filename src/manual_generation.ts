@@ -184,6 +184,45 @@ async function showRegenerationDialog(
         resolve(selectedMode);
       });
 
+    const copyBtn = $('<button>')
+      .text(t('modal.copyPrompt'))
+      .addClass('menu_button')
+      .on('click', async () => {
+        const normalizedUrl = normalizeImageUrl(imageUrl);
+        const metadata = getMetadata();
+        const promptNode = getPromptForImage(normalizedUrl, metadata);
+        
+        if (promptNode && promptNode.text) {
+          const text = promptNode.text;
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(text);
+              toastr.success(t('modal.copiedToClipboard'), t('extensionName'));
+            } else {
+              const textarea = document.createElement('textarea');
+              textarea.value = text;
+              textarea.style.position = 'fixed';
+              textarea.style.left = '-9999px';
+              document.body.appendChild(textarea);
+              textarea.select();
+              try {
+                document.execCommand('copy');
+                toastr.success(t('modal.copiedToClipboard'), t('extensionName'));
+              } catch (err) {
+                toastr.error(t('modal.copyFailed'), t('extensionName'));
+              } finally {
+                document.body.removeChild(textarea);
+              }
+            }
+          } catch (err) {
+            logger.error('Failed to copy to clipboard', err);
+            toastr.error(t('modal.copyFailed'), t('extensionName'));
+          }
+        } else {
+          toastr.error(t('toast.promptNotFoundForImage'), t('extensionName'));
+        }
+      });
+
     const updateBtn = $('<button>')
       .text(t('dialog.updatePrompt'))
       .addClass('menu_button')
@@ -226,6 +265,7 @@ async function showRegenerationDialog(
 
     buttons
       .append(generateBtn)
+      .append(copyBtn)
       .append(updateBtn)
       .append(deleteBtn)
       .append(viewAllBtn)
